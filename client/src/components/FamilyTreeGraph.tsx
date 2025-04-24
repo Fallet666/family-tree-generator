@@ -5,9 +5,9 @@ import "../styles/graph.css";
 
 interface Props { treeData: FamilyTree }
 
-const X_SPACING = 180;
+const X_SPACING = 400;
 const Y_SPACING = 200;
-const SPOUSE_OFFSET = 100;
+const SPOUSE_OFFSET = 120;
 const DEFAULT_PHOTO =
     "https://yt3.googleusercontent.com/ytc/AIdro_k8ktKuQmVRXjH3RzMekX2wCP6VoKl3qiVYk7TZGmTl850=s900-c-k-c0x00ffffff-no-rj";
 
@@ -27,13 +27,10 @@ const FamilyTreeGraph: React.FC<Props> = ({ treeData }) => {
   useEffect(() => {
     if (!ref.current) return;
 
-    // 1. Build couples map
     const couples = new Map<string, CoupleNode>();
-    // initialize each person as single couple
     treeData.persons.forEach(p => {
       couples.set(p.id, { id: p.id, members: [p.id], parent: null, children: [], gen: 0, width: 0, xCenter: 0 });
     });
-    // combine spouses
     treeData.relations.filter(r => r.type === 'spouse').forEach(r => {
       const [a, b] = [r.from, r.to].sort();
       const cid = `pair-${a}-${b}`;
@@ -43,80 +40,85 @@ const FamilyTreeGraph: React.FC<Props> = ({ treeData }) => {
         couples.set(cid, { id: cid, members: [a, b], parent: null, children: [], gen: 0, width: 0, xCenter: 0 });
       }
     });
-
-    // helper to find couple by person id
     const findCouple = (pid: string) => {
       for (const [cid, c] of couples) if (c.members.includes(pid)) return cid;
       return pid;
     };
-
-    // 2. Link parent-child at couple level
     treeData.relations.filter(r => r.type === 'parent').forEach(r => {
       const pc = findCouple(r.from);
       const cc = findCouple(r.to);
       if (pc && cc && pc !== cc) {
-        const parentC = couples.get(pc)!;
-        const childC = couples.get(cc)!;
-        parentC.children.push(cc);
-        childC.parent = pc;
+        if (!couples.get(pc)!.children.includes(cc)) {
+          couples.get(pc)!.children.push(cc);
+        }
+        if (couples.get(cc)!.parent === null) couples.get(cc)!.parent = pc;
       }
     });
 
-    // 3. Assign generation to couples via BFS
     const roots = Array.from(couples.values()).filter(c => c.parent === null);
-    const queue: string[] = roots.map(c => c.id);
-    queue.forEach(cid => { couples.get(cid)!.gen = 0 });
+    const queue = roots.map(c => c.id);
+    roots.forEach(c => { couples.get(c.id)!.gen = 0; });
     while (queue.length) {
       const cid = queue.shift()!;
-      const cnode = couples.get(cid)!;
-      cnode.children.forEach(cc => {
-        const child = couples.get(cc)!;
-        child.gen = cnode.gen + 1;
-        queue.push(cc);
+      const c = couples.get(cid)!;
+      c.children.forEach(ch => {
+        const child = couples.get(ch)!;
+        child.gen = c.gen + 1;
+        queue.push(ch);
       });
     }
 
-    // 4. Compute subtree widths via DFS
     const dfsWidth = (cid: string): number => {
-      const cnode = couples.get(cid)!;
-      if (!cnode.children.length) {
-        cnode.width = cnode.members.length;
+      const c = couples.get(cid)!;
+      if (!c.children.length) {
+        c.width = c.members.length;
       } else {
-        cnode.width = cnode.children.reduce((sum, cc) => sum + dfsWidth(cc), 0);
-        // ensure width at least members count
-        cnode.width = Math.max(cnode.width, cnode.members.length);
+        c.width = c.children.reduce((sum, ch) => sum + dfsWidth(ch), 0);
+        c.width = Math.max(c.width, c.members.length);
       }
-      return cnode.width;
+      return c.width;
     };
     roots.forEach(r => dfsWidth(r.id));
 
-    // 5. Compute xCenter via DFS
     let cursor = 0;
+    const childToParents = new Map<string, string[]>();
+    for (const [cid, couple] of couples) {
+      couple.children.forEach(ch => {
+        if (!childToParents.has(ch)) childToParents.set(ch, []);
+        childToParents.get(ch)!.push(cid);
+      });
+    }
+
     const assignX = (cid: string) => {
-      const cnode = couples.get(cid)!;
-      if (!cnode.children.length) {
-        cnode.xCenter = cursor + (cnode.width * X_SPACING) / 2;
-        cursor += cnode.width * X_SPACING;
+      const c = couples.get(cid)!;
+      if (!c.children.length) {
+        c.xCenter = cursor + (c.width * X_SPACING) / 2;
+        cursor += c.width * X_SPACING;
       } else {
-        cnode.children.forEach(cc => assignX(cc));
-        const xs = cnode.children.map(cc => couples.get(cc)!.xCenter);
-        cnode.xCenter = xs.reduce((a, b) => a + b, 0) / xs.length;
+        c.children.forEach(ch => assignX(ch));
+        const childXs = c.children.map(ch => couples.get(ch)!.xCenter);
+        const myXs = childToParents.get(cid)?.map(pid => couples.get(pid)!.xCenter) || [];
+        const avgXs = [...childXs, ...myXs].filter(Boolean);
+        if (avgXs.length > 0) {
+          c.xCenter = avgXs.reduce((a, b) => a + b, 0) / avgXs.length;
+        }
       }
     };
     roots.forEach(r => assignX(r.id));
 
-    // 6. Prepare elements
+    const primary = findCouple(treeData.persons[0].id);
+    const offsetX = couples.get(primary)!.xCenter;
+
     const elements: ElementDefinition[] = [];
     treeData.persons.forEach(p => {
       const cid = findCouple(p.id);
-      const cnode = couples.get(cid)!;
-      const gen = cnode.gen;
-      const idx = cnode.members.indexOf(p.id);
-      const x = cnode.xCenter + (idx * 2 - (cnode.members.length - 1)) * SPOUSE_OFFSET;
-      const y = gen * Y_SPACING;
+      const c = couples.get(cid)!;
+      const idx = c.members.indexOf(p.id);
+      const xRaw = c.xCenter + (idx * 2 - (c.members.length - 1)) * SPOUSE_OFFSET;
+      const y = c.gen * Y_SPACING;
       elements.push({
-        data: { id: p.id, label: p.fullName + '\n' + p.birthDate },
-        position: { x, y },
+        data: { id: p.id, label: p.fullName + "\n" + p.birthDate },
+        position: { x: xRaw - offsetX, y },
         style: {
           'background-image': p.photoUrl || DEFAULT_PHOTO,
           'background-fit': 'cover',
@@ -143,7 +145,6 @@ const FamilyTreeGraph: React.FC<Props> = ({ treeData }) => {
       });
     });
 
-    // 7. Init cytoscape
     const cy: Core = cytoscape({
       container: ref.current!,
       elements,
