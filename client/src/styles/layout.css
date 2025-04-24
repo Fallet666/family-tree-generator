@@ -1,0 +1,54 @@
+
+.container {
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+}
+
+.app-header, .app-footer {
+  background: white;
+  border-bottom: 1px solid #dee2e6;
+  padding: 1rem 2rem;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.04);
+}
+
+.app-footer {
+  border-top: 1px solid #dee2e6;
+  border-bottom: none;
+  margin-top: auto;
+  text-align: center;
+  font-size: 0.9rem;
+  color: #6c757d;
+}
+
+.app-main {
+  display: flex;
+  flex-direction: column;
+  gap: 2rem;
+  padding: 2rem;
+}
+
+@media (min-width: 768px) {
+  .app-main {
+    flex-direction: row;
+    align-items: flex-start;
+  }
+
+  .person-form {
+    width: 300px;
+    flex-shrink: 0;
+  }
+
+  .graph-area {
+    flex-grow: 1;
+    min-height: 600px;
+  }
+}
+
+.actions {
+  margin-top: 0.5rem;
+  display: flex;
+  gap: 1rem;
+  flex-wrap: wrap;
+  align-items: center;
+}

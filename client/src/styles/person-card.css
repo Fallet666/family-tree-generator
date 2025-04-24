@@ -1,0 +1,29 @@
+.person-card {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  font-size: 10px;
+  padding: 6px;
+  text-align: center;
+  border-radius: 6px;
+  color: #fff;
+  background-color: #0074D9;
+}
+
+.person-card__name {
+  font-weight: bold;
+  margin-bottom: 2px;
+}
+
+.person-card__birth {
+  font-style: italic;
+}
+
+.person-card__photo {
+  width: 40px;
+  height: 40px;
+  object-fit: cover;
+  border-radius: 50%;
+  margin-bottom: 4px;
+  border: 1px solid #fff;
+}
