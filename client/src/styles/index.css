@@ -1,64 +1,161 @@
+/* === Базовая стилизация в стиле macOS/iOS === */
+
 body {
   margin: 0;
-  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", sans-serif;
-  background: #f8f9fa;
-  color: #212529;
+  padding: 0;
+  background: linear-gradient(180deg, #f5f5f7 0%, #ffffff 100%);
+  color: #1d1d1f;
+  font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", "Segoe UI", Roboto, "Helvetica Neue", sans-serif;
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+  line-height: 1.6;
+  transition: background 0.4s ease;
 }
 
+/* Заголовки */
 h1, h2 {
   margin: 0.5em 0;
-  font-weight: 500;
+  font-weight: 600;
+  color: #1d1d1f;
+  letter-spacing: -0.02em;
+  transition: all 0.3s ease;
 }
 
-input, select, button {
+/* Поля ввода и select */
+input {
   font-size: 1rem;
-  padding: 0.5rem;
-  margin: 0.25rem 0;
-  border: 1px solid #ccc;
-  border-radius: 6px;
+  padding: 0.75rem 0.9rem;
+  border: 1px solid #d1d1d6;
+  border-radius: 12px;
+  background-color: #f9f9fb;
+  box-shadow: inset 0 1px 2px rgba(0,0,0,0.03);
+  color: #1d1d1f;
+  transition: all 0.2s ease;
   width: 100%;
   box-sizing: border-box;
+  outline: none;
+  margin-bottom: 10px;
 }
 
-button {
-  background-color: #007bff;
-  color: white;
-  border: none;
+/* Кастомный Select Apple-style */
+select {
+  appearance: none;
+  -webkit-appearance: none;
+  -moz-appearance: none;
+  background-color: #f9f9fb;
+  background-image: url("data:image/svg+xml;charset=UTF-8,%3Csvg width='10' height='6' viewBox='0 0 10 6' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M1 1l4 4 4-4' stroke='%230a84ff' stroke-width='1.5' fill='none' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 0.75rem center;
+  background-size: 12px 12px;
+
+  padding: 0.75rem 2.5rem 0.75rem 0.9rem;
+  border: 1px solid #d1d1d6;
+  border-radius: 12px;
+  font-size: 1rem;
+  font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", "Segoe UI", Roboto, sans-serif;
+  font-weight: 500;
+  color: #1d1d1f;
+  box-shadow: inset 0 1px 2px rgba(0, 0, 0, 0.03);
   cursor: pointer;
+  transition: all 0.25s ease;
+  width: 100%;
+  box-sizing: border-box;
+  outline: none;
+  margin-bottom: 10px;
+}
+
+select:hover {
+  background-color: #fefeff;
+  border-color: #c7c7cc;
+}
+
+select:focus {
+  border-color: #0a84ff;
+  background-color: #ffffff;
+  box-shadow: 0 0 0 3px rgba(10, 132, 255, 0.2);
+}
+
+/* Для Safari: скрыть стандартную стрелку */
+select::-ms-expand {
+  display: none;
+}
+
+input:focus {
+  border-color: #0a84ff;
+  background-color: #fff;
+  box-shadow: 0 0 0 3px rgba(10, 132, 255, 0.2);
+}
+
+/* Кнопки */
+button {
+  font-size: 1rem;
+  font-weight: 600;
+  padding: 0.75rem 1.25rem;
+  border: none;
+  border-radius: 14px;
+  color: white;
+  background: #0a84ff;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  box-shadow: 0 4px 12px rgba(10, 132, 255, 0.2);
 }
 
 button:hover {
-  background-color: #0056b3;
+  background-color: #0066cc;
+  box-shadow: 0 6px 18px rgba(0, 102, 204, 0.25);
 }
 
+button:active {
+  background-color: #0052a3;
+  box-shadow: inset 0 3px 6px rgba(0, 82, 163, 0.3);
+}
+
+/* Кастомный label-кнопка */
 label.btn {
+  text-align: center;
   display: inline-block;
-  padding: 0.5rem 1rem;
-  background: #28a745;
+  padding: 0.65rem 1.2rem;
+  background: #34c759;
   color: white;
-  border-radius: 6px;
+  border-radius: 14px;
+  font-weight: 600;
   cursor: pointer;
-  margin-right: 0.5rem;
+  transition: background-color 0.2s ease, transform 0.2s ease;
+  user-select: none;
 }
 
 label.btn:hover {
-  background: #218838;
+  background: #28a745;
+  transform: translateY(-1px);
 }
 
+label.btn:active {
+  background: #1e7e34;
+  transform: scale(0.98);
+}
+
+/* Блок кнопок действий */
 .actions .btn {
-  background: #f1f3f5;
-  color: #212529;
-  border: 1px solid #ced4da;
-  border-radius: 8px;
-  padding: 0.5rem 1rem;
+  background: #f2f3f5;
+  color: #1d1d1f;
+  border: 1px solid #d1d1d6;
+  border-radius: 12px;
+  padding: 0.65rem 1rem;
   font-size: 14px;
   display: inline-flex;
   align-items: center;
   gap: 0.5rem;
-  transition: all 0.2s ease;
+  font-weight: 500;
+  transition: all 0.25s ease;
 }
 
 .actions .btn:hover {
-  background: #e9ecef;
-  border-color: #adb5bd;
+  background: #e5e6ea;
+  border-color: #b0b3b8;
+  transform: translateY(-1px);
+}
+
+.actions .btn:active {
+  background: #d6d8dc;
+  transform: scale(0.97);
 }

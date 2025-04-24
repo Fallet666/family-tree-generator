@@ -5,7 +5,6 @@ import PersonForm from "./PersonForm";
 import "../styles/index.css";
 import "../styles/layout.css";
 import "../styles/form.css";
-import "../styles/graph.css";
 import "../styles/person-card.css";
 import { FamilyTree } from "../types/FamilyTree";
 

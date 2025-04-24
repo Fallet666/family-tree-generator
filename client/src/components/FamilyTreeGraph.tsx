@@ -1,15 +1,14 @@
 import React, { useEffect, useRef } from "react";
-import cytoscape, { Core, ElementDefinition } from "cytoscape";
+import cytoscape, { Core, ElementDefinition, StylesheetCSS } from "cytoscape";
 import { FamilyTree } from "../types/FamilyTree";
-import "../styles/graph.css";
 
 interface Props { treeData: FamilyTree }
 
 const X_SPACING = 400;
 const Y_SPACING = 200;
 const SPOUSE_OFFSET = 120;
-const DEFAULT_PHOTO =
-    "https://yt3.googleusercontent.com/ytc/AIdro_k8ktKuQmVRXjH3RzMekX2wCP6VoKl3qiVYk7TZGmTl850=s900-c-k-c0x00ffffff-no-rj";
+const DEFAULT_PHOTO = "../images/ava.jpg";
+
 
 interface CoupleNode {
   id: string;
@@ -20,6 +19,106 @@ interface CoupleNode {
   width: number;
   xCenter: number;
 }
+
+const cssVar = (v: string) =>
+    getComputedStyle(document.documentElement).getPropertyValue(v).trim() || undefined;
+
+const palette = {
+  surface : cssVar("--apple-surface") || "#ffffff",
+  border  : cssVar("--apple-border")  || "#d1d1d6",
+  text    : cssVar("--apple-text")    || "#1d1d1f",
+  accent  : cssVar("--apple-accent")  || "#0a84ff"
+};
+
+const cyStyle: StylesheetCSS = `
+  node.person {
+    width: 88px;
+    height: 112px;
+    shape: round-rectangle;
+
+    background-color: ${palette.surface};
+    background-image: data(photo);
+    background-fit: cover;
+    background-position-x: 50%;
+    background-position-y: 50%;
+
+    border-width: 1.5px;
+    border-color: ${palette.border};
+    border-opacity: 1;
+    border-radius: 24;
+
+    shadow-blur: 14;
+    shadow-color: rgba(0,0,0,0.08);
+    shadow-offset-x: 0;
+    shadow-offset-y: 4;
+
+    label: data(label);
+    font-size: 13px;
+    font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Text', 'Segoe UI', Roboto, sans-serif;
+    font-weight: 500;
+    text-wrap: wrap;
+    text-max-width: 76;
+    text-valign: bottom;
+    text-halign: center;
+    text-outline-width: 1;
+    text-outline-color: rgba(255,255,255,0.8);
+    color: ${palette.text};
+
+    transition-property: background-color, border-color, shadow-blur;
+    transition-duration: 300ms;
+    transition-timing-function: ease-in-out;
+  }
+
+  node.person:selected {
+    border-color: ${palette.accent};
+    border-width: 2px;
+    shadow-blur: 18;
+    shadow-color: rgba(10,132,255,0.35);
+    background-color: linear-gradient(145deg, #f0f4ff, #ffffff);
+  }
+
+  edge.edge-parent {
+    width: 2.2px;
+    line-color: #8e8e93;
+    line-style: solid;
+    target-arrow-shape: triangle;
+    target-arrow-color: #8e8e93;
+
+    label: data(label);
+    font-size: 10px;
+    font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Text', 'Segoe UI', sans-serif;
+    font-weight: 500;
+
+    text-margin-y: -10;
+    text-background-color: rgba(255,255,255,0.8);
+    text-background-opacity: 1;
+    text-border-opacity: 0.2;
+    color: #4a4a4a;
+  }
+
+  edge.edge-spouse {
+    width: 2px;
+    line-style: dashed;
+    line-color: #b1b1b6;
+
+    label: data(label);
+    font-size: 10px;
+    font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Text', 'Segoe UI', sans-serif;
+    font-weight: 500;
+
+    text-background-color: rgba(255,255,255,0.8);
+    text-background-opacity: 1;
+    text-border-opacity: 0.2;
+    color: #4a4a4a;
+  }
+
+  node.person:active {
+    shadow-blur: 24;
+    shadow-color: rgba(0,0,0,0.15);
+    transition-duration: 150ms;
+  }
+`;
+
 
 const FamilyTreeGraph: React.FC<Props> = ({ treeData }) => {
   const ref = useRef<HTMLDivElement>(null);
@@ -117,25 +216,13 @@ const FamilyTreeGraph: React.FC<Props> = ({ treeData }) => {
       const xRaw = c.xCenter + (idx * 2 - (c.members.length - 1)) * SPOUSE_OFFSET;
       const y = c.gen * Y_SPACING;
       elements.push({
-        data: { id: p.id, label: p.fullName + "\n" + p.birthDate },
         position: { x: xRaw - offsetX, y },
-        style: {
-          'background-image': p.photoUrl || DEFAULT_PHOTO,
-          'background-fit': 'cover',
-          'background-opacity': 1,
-          'border-width': 3,
-          'border-color': '#444',
-          shape: 'roundrectangle',
-          width: 100,
-          height: 120,
-          'font-size': 10,
-          'text-wrap': 'wrap',
-          'text-max-width': 90,
-          'text-valign': 'bottom',
-          'text-halign': 'center',
-          color: '#000',
-          'background-color': '#fff'
-        }
+        data: {
+        id: p.id,
+        label: `${p.fullName}\n${p.birthDate}`,
+         photo: p.photoUrl || DEFAULT_PHOTO    // ← понадобится в cyStyle
+    },
+   classes: "person"
       });
     });
     treeData.relations.forEach(r => {
@@ -149,30 +236,7 @@ const FamilyTreeGraph: React.FC<Props> = ({ treeData }) => {
       container: ref.current!,
       elements,
       layout: { name: 'preset', padding: 50 },
-      style: [
-        { selector: 'node', style: { label: 'data(label)' } },
-        { selector: '.edge-parent', style: {
-            width: 2,
-            'line-color': '#888',
-            'target-arrow-shape': 'triangle',
-            'target-arrow-color': '#888',
-            label: 'data(label)',
-            'font-size': 10,
-            'text-margin-y': -10,
-            'text-background-opacity': 1,
-            'text-background-color': '#fff'
-          }},
-        { selector: '.edge-spouse', style: {
-            width: 2,
-            'line-style': 'dashed',
-            'line-color': '#aaa',
-            'target-arrow-shape': 'none',
-            label: 'data(label)',
-            'font-size': 10,
-            'text-background-opacity': 1,
-            'text-background-color': '#fff'
-          }}
-      ]
+      style: cyStyle as unknown as StylesheetCSS
     });
     cy.fit();
   }, [treeData]);
