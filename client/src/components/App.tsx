@@ -1,4 +1,5 @@
-import React, { useState } from "react";
+
+import React, { useState, useEffect } from "react";
 import FamilyTreeGraph from "./FamilyTreeGraph";
 import PersonForm from "./PersonForm";
 import "../styles/index.css";
@@ -37,15 +38,15 @@ const initialData: FamilyTree = {
 };
 
 const App: React.FC = () => {
-  React.useEffect(() => {
+  const [treeData, setTreeData] = useState<FamilyTree>(initialData);
+
+  useEffect(() => {
     const handler = (e: any) => {
       if (e.detail) setTreeData(e.detail);
     };
     window.addEventListener("tree:update", handler);
     return () => window.removeEventListener("tree:update", handler);
   }, []);
-
-  const [treeData, setTreeData] = useState<FamilyTree>(initialData);
 
   const handleAddPerson = (newTree: FamilyTree) => {
     setTreeData(newTree);
@@ -81,27 +82,29 @@ const App: React.FC = () => {
   };
 
   return (
-    <div className="container">
-      <header className="app-header">
-        <h1>Генеалогическое древо</h1>
-        <div className="actions">
-          <label className="btn">
-            Импорт
-            <input type="file" accept=".json" onChange={handleImport} hidden />
-          </label>
-          <button className="btn" onClick={handleExport}>Экспорт</button>
+    <>
+      <div className="container">
+        <div className="sidebar">
+          <div className="sidebar__logo">Генеалогическое древо</div>
+          <div className="sidebar__section">
+            <label className="btn">
+              Импорт
+              <input type="file" accept=".json" onChange={handleImport} hidden />
+            </label>
+            <button className="btn" onClick={handleExport}>Экспорт</button>
+          </div>
+          <div className="sidebar__section">
+            <PersonForm treeData={treeData} onUpdateTree={handleAddPerson} />
+          </div>
         </div>
-      </header>
-
-      <main className="app-main">
-        <PersonForm treeData={treeData} onUpdateTree={handleAddPerson} />
-        <FamilyTreeGraph treeData={treeData} />
-      </main>
-
+        <div className="main-content">
+          <FamilyTreeGraph treeData={treeData} />
+        </div>
+      </div>
       <footer className="app-footer">
         <p>© 2025 Алексей Коротков. Сделано с душой.</p>
       </footer>
-    </div>
+    </>
   );
 };
 
