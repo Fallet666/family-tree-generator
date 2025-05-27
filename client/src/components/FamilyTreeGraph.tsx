@@ -30,7 +30,7 @@ const palette = {
   accent  : cssVar("--apple-accent")  || "#0a84ff"
 };
 
-const cyStyle: StylesheetCSS = `
+const cyStyle: string = `
   node.person {
     width: 88px;
     height: 112px;
@@ -232,11 +232,12 @@ const FamilyTreeGraph: React.FC<Props> = ({ treeData }) => {
       });
     });
 
+    // @ts-ignore
     const cy: Core = cytoscape({
       container: ref.current!,
       elements,
       layout: { name: 'preset', padding: 50 },
-      style: cyStyle as unknown as StylesheetCSS
+      style: cyStyle as any
     });
     cy.fit();
   }, [treeData]);

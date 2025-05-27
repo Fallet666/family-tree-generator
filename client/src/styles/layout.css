@@ -67,3 +67,59 @@
   align-items: center;
   justify-content: center;
 }
+.sidebar__header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 1rem;
+  gap: 1rem;
+  white-space: nowrap; /* ← запретить перенос */
+}
+
+.sidebar__title {
+  font-size: 1.2rem;
+  font-weight: 600;
+  margin: 0;
+  flex-grow: 1;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.sidebar__toggle {
+  background-color: #0a84ff;
+  border: none;
+  color: white;
+  border-radius: 0.5rem;
+  padding: 0.3rem 0.6rem;
+  font-size: 1.1rem;
+  cursor: pointer;
+  min-width: auto;
+  width: auto;
+  height: auto;
+  transition: background-color 0.2s ease;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.sidebar__toggle:hover {
+  background-color: #0066cc;
+}
+
+.sidebar__toggle--floating {
+  position: absolute;
+  top: 1rem;
+  left: 1rem;
+  z-index: 10;
+  background-color: #0a84ff;
+  color: white;
+  border-radius: 0.75rem;
+  width: 2.5rem;
+  height: 2.5rem;
+  font-size: 1.2rem;
+  border: none;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
