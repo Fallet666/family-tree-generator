@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { FamilyTree } from "../types/FamilyTree";
+import { FamilyTree, RelationType } from "../types/FamilyTree";
 import "../styles/form.css";
 
 interface Props {
@@ -15,24 +15,39 @@ const PersonForm: React.FC<Props> = ({ treeData, onUpdateTree }) => {
   const [targetId, setTargetId] = useState("");
   const [linkSecondId, setLinkSecondId] = useState("");
 
-  const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
 
-    const newId = (treeData.persons.length + 1).toString();
-    const newPerson = { id: newId, fullName, birthDate, photoUrl };
+    const handleSubmit = (e: React.FormEvent) => {
+        e.preventDefault();
 
-    const updatedPersons = [...treeData.persons, newPerson];
-    const updatedRelations = targetId
-      ? [...treeData.relations, { from: targetId, to: newId, type: linkType }]
-      : [...treeData.relations];
+        const newId = (treeData.persons.length + 1).toString();
+        const newPerson = { id: newId, fullName, birthDate, photoUrl };
 
-    onUpdateTree({ persons: updatedPersons, relations: updatedRelations });
+        const updatedPersons = [...treeData.persons, newPerson];
 
-    setFullName("");
-    setBirthDate("");
-    setPhotoUrl("");
-    setTargetId("");
-  };
+        let newRelation: { from: string; to: string; type: RelationType } | null = null;
+
+        if (targetId && linkType) {
+            if (linkType === "parent") {
+                newRelation = { from: newId, to: targetId, type: "parent" };
+            } else if (linkType === "child") {
+                newRelation = { from: targetId, to: newId, type: "parent" };
+            } else if (linkType === "spouse") {
+                newRelation = { from: newId, to: targetId, type: "spouse" };
+            }
+        }
+
+        const updatedRelations = newRelation
+            ? [...treeData.relations, newRelation]
+            : [...treeData.relations];
+
+        onUpdateTree({ persons: updatedPersons, relations: updatedRelations });
+
+        setFullName("");
+        setBirthDate("");
+        setPhotoUrl("");
+        setTargetId("");
+        setLinkType("");
+    };
 
   return (
     <form className="person-form" onSubmit={handleSubmit}>

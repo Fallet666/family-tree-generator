@@ -5,7 +5,7 @@ export interface Person {
   photoUrl?: string;
 }
 
-export type RelationType = "" | "spouse" | "parent" | "child";
+export type RelationType = '' | 'parent' | 'child' | 'spouse';
 
 export interface Relation {
   from: string;
