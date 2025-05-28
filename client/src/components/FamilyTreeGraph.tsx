@@ -2,7 +2,10 @@ import React, { useEffect, useRef } from "react";
 import cytoscape, { Core, ElementDefinition, StylesheetCSS } from "cytoscape";
 import { FamilyTree } from "../types/FamilyTree";
 
-interface Props { treeData: FamilyTree }
+interface Props {
+  treeData: FamilyTree
+  showLabels: boolean;
+}
 
 const X_SPACING = 400;
 const Y_SPACING = 200;
@@ -30,8 +33,8 @@ const palette = {
   accent  : cssVar("--apple-accent")  || "#0a84ff"
 };
 
-const cyStyle: string = `
-  node.person {
+const getCyStyle = (showLabels: boolean): string =>
+  `node.person {
     width: 88px;
     height: 112px;
     shape: round-rectangle;
@@ -84,7 +87,7 @@ const cyStyle: string = `
     target-arrow-shape: triangle;
     target-arrow-color: #8e8e93;
 
-    label: data(label);
+    label: ${showLabels ? 'data(label)' : ''};
     font-size: 10px;
     font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Text', 'Segoe UI', sans-serif;
     font-weight: 500;
@@ -101,7 +104,7 @@ const cyStyle: string = `
     line-style: dashed;
     line-color: #b1b1b6;
 
-    label: data(label);
+    label: ${showLabels ? 'data(label)' : ''};
     font-size: 10px;
     font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Text', 'Segoe UI', sans-serif;
     font-weight: 500;
@@ -120,7 +123,7 @@ const cyStyle: string = `
 `;
 
 
-const FamilyTreeGraph: React.FC<Props> = ({ treeData }) => {
+const FamilyTreeGraph: React.FC<Props> = ({ treeData, showLabels }) => {
   const ref = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
@@ -237,10 +240,10 @@ const FamilyTreeGraph: React.FC<Props> = ({ treeData }) => {
       container: ref.current!,
       elements,
       layout: { name: 'preset', padding: 50 },
-      style: cyStyle as any
+      style: getCyStyle(showLabels) as any
     });
     cy.fit();
-  }, [treeData]);
+  }, [treeData, showLabels]);
 
   return <div ref={ref} className="graph-container" />;
 };

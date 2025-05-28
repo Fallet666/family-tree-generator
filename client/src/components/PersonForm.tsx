@@ -1,5 +1,6 @@
 import React, { useState } from "react";
 import { FamilyTree } from "../types/FamilyTree";
+import "../styles/form.css";
 
 interface Props {
   treeData: FamilyTree;
@@ -10,7 +11,7 @@ const PersonForm: React.FC<Props> = ({ treeData, onUpdateTree }) => {
   const [fullName, setFullName] = useState("");
   const [birthDate, setBirthDate] = useState("");
   const [photoUrl, setPhotoUrl] = useState("");
-  const [linkType, setLinkType] = useState<"parent" | "child" | "spouse">("parent");
+  const [linkType, setLinkType] = useState<"" | "parent" | "child" | "spouse">("");
   const [targetId, setTargetId] = useState("");
   const [linkSecondId, setLinkSecondId] = useState("");
 
@@ -56,40 +57,47 @@ const PersonForm: React.FC<Props> = ({ treeData, onUpdateTree }) => {
         onChange={(e) => setPhotoUrl(e.target.value)}
       />
 
-      <select value={linkType} onChange={(e) => setLinkType(e.target.value as 'parent' | 'child' | 'spouse')}>
-        <option value="parent">Родитель</option>
-        <option value="child">Ребёнок</option>
-        <option value="spouse">Супруг(а)</option>
-      </select>
-
-      <select value={targetId} onChange={(e) => setTargetId(e.target.value)}>
-        <option value="">— Без связи —</option>
-        {treeData.persons.map((p) => (
-          <option key={p.id} value={p.id}>
-            {p.fullName}
-          </option>
-        ))}
-      </select>
-
-      <button type="submit">Добавить</button>
-
-
-      <h2>Добавить связь</h2>
-      <div className="link-form">
-        <select value={linkType} onChange={(e) => setLinkType(e.target.value as 'parent' | 'child' | 'spouse')}>
-          <option value="parent">Родитель</option>
-          <option value="child">Ребёнок</option>
-          <option value="spouse">Супруг(а)</option>
+        <select
+            value={linkType}
+            onChange={(e) => setLinkType(e.target.value as '' | 'parent' | 'child' | 'spouse')}
+        >
+            <option value="">— Роль —</option>
+            <option value="parent">Родитель</option>
+            <option value="child">Ребёнок</option>
+            <option value="spouse">Супруг(а)</option>
         </select>
 
         <select value={targetId} onChange={(e) => setTargetId(e.target.value)}>
-          <option value="">— Кто —</option>
-          {treeData.persons.map((p) => (
-            <option key={p.id} value={p.id}>
-              {p.fullName}
-            </option>
-          ))}
+            <option value="">— Без связи —</option>
+            {treeData.persons.map((p) => (
+                <option key={p.id} value={p.id}>
+                    {p.fullName}
+                </option>
+            ))}
         </select>
+
+      <button type="submit">Добавить</button>
+
+      <h2>Добавить связь</h2>
+      <div className="link-form">
+          <select
+              value={linkType}
+              onChange={(e) => setLinkType(e.target.value as 'parent' | 'child' | 'spouse')}
+          >
+              <option value="">— Роль —</option>
+              <option value="parent">Родитель</option>
+              <option value="child">Ребёнок</option>
+              <option value="spouse">Супруг(а)</option>
+          </select>
+
+          <select value={targetId} onChange={(e) => setTargetId(e.target.value)}>
+              <option value="">— Кто —</option>
+              {treeData.persons.map((p) => (
+                  <option key={p.id} value={p.id}>
+                      {p.fullName}
+                  </option>
+              ))}
+          </select>
 
         <select value={linkSecondId} onChange={(e) => setLinkSecondId(e.target.value)}>
           <option value="">— Кому —</option>
