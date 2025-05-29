@@ -33,8 +33,8 @@
 }
 
 .sidebar__section + .sidebar__section {
-  margin-top: 1rem;
-  padding-top: 1rem;
+  margin-top: 0.25rem;
+  padding-top: 0.5rem;
   border-top: 1px solid #e0e0e0;
 }
 
@@ -173,4 +173,62 @@
 
 .checkbox input[type="checkbox"]:checked::after {
   display: block;
+}
+
+
+/* Унифицированные стили формы и элементов управления */
+.btn, .form__button {
+  padding: 0.8rem 1rem;
+  font-size: 1rem;
+  font-weight: 600;
+  color: #fff;
+  background-color: #0a84ff;
+  border: none;
+  border-radius: 12px;
+  cursor: pointer;
+  transition: background-color 0.2s ease;
+}
+
+.btn:hover, .form__button:hover {
+  background-color: #006be6;
+}
+
+input[type="text"],
+input[type="date"],
+select {
+  padding: 0.75rem 0.9rem;
+  font-size: 1rem;
+  border-radius: 12px;
+  border: 1px solid #d1d1d6;
+  background-color: #f9f9fb;
+  color: #1d1d1f;
+  outline: none;
+  transition: all 0.2s ease;
+}
+
+input[type="text"]:focus,
+input[type="date"]:focus,
+select:focus {
+  border-color: #0a84ff;
+  background-color: #fff;
+  box-shadow: 0 0 0 3px rgba(10, 132, 255, 0.25);
+}
+
+.checkbox {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  margin-top: 0.75rem;
+}
+
+.checkbox input[type="checkbox"] {
+  width: 18px;
+  height: 18px;
+  accent-color: #0a84ff;
+  margin: 0;
+}
+
+.checkbox__text {
+  font-size: 0.95rem;
+  color: #1d1d1f;
 }

@@ -39,6 +39,7 @@ const App: React.FC = () => {
     const [sidebarOpen, setSidebarOpen] = useState(true);
     const [treeData, setTreeData] = useState<FamilyTree>(initialData);
     const [showLabels, setShowLabels] = useState(true);
+    const [showBirthDates, setShowBirthDates] = useState(true);
     const sidebarRef = useRef<HTMLDivElement>(null);
     const [toggleLeft, setToggleLeft] = useState("1rem");
 
@@ -107,7 +108,7 @@ const App: React.FC = () => {
                 {sidebarOpen && (
                     <div className="sidebar" ref={sidebarRef}>
                         <div className="sidebar__header">
-                            <h2  className="sidebar__title">Семейное древо</h2>
+                            <h2 className="sidebar__title">Семейное древо</h2>
                         </div>
                         <div className="sidebar__section">
                             <label className="btn">
@@ -125,15 +126,23 @@ const App: React.FC = () => {
                                 />
                                 <span className="checkbox__text">Отобразить названия связей</span>
                             </label>
+                            <label className="checkbox">
+                                <input
+                                    type="checkbox"
+                                    checked={showBirthDates}
+                                    onChange={() => setShowBirthDates(prev => !prev)}
+                                />
+                                <span className="checkbox__text">Отобразить даты рождения</span>
+                            </label>
                         </div>
                         <div className="sidebar__section">
-                            <PersonForm treeData={treeData} onUpdateTree={handleAddPerson}/>
+                            <PersonForm treeData={treeData} onUpdateTree={handleAddPerson} />
                         </div>
                     </div>
                 )}
 
                 <div className={`main-content ${!sidebarOpen ? "main-content--expanded" : ""}`}>
-                    <FamilyTreeGraph treeData={treeData} showLabels={showLabels} />
+                    <FamilyTreeGraph treeData={treeData} showLabels={showLabels} showBirthDates={showBirthDates} />
                 </div>
             </div>
 
