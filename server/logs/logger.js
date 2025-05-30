@@ -66,3 +66,14 @@ module.exports = {
     getLogs,
     clearLogs,
 };
+
+
+function appendProjectLog(projectId, entry) {
+    const projectLogPath = path.join(__dirname, `${projectId}.log`);
+    fetchServerTime((timestamp) => {
+        const line = `[${timestamp}] ${entry}\n`;
+        fs.appendFileSync(projectLogPath, line);
+    });
+}
+
+module.exports.appendProjectLog = appendProjectLog;

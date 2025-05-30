@@ -10,7 +10,6 @@ export default function HomePage() {
         localStorage.removeItem("saved_tree");
         localStorage.removeItem("current_user");
         localStorage.removeItem("family_log"); // если ты всё ещё используешь localStorage для клиентских логов
-
         await resetLog(); // очищаем серверные логи
         navigate("/tree");
     };

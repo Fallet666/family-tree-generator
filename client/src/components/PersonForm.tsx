@@ -28,13 +28,13 @@ const PersonForm: React.FC<Props> = ({ treeData, onUpdateTree, currentUser }) =>
         spouse: "супруг(а)"
     };
 
-    const sendTreeToServer = async (tree: FamilyTree) => {
-        await fetch("/api/tree", {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify(tree)
-        });
-    };
+    // const sendTreeToServer = async (tree: FamilyTree) => {
+    //     await fetch("/tree", {
+    //         method: "POST",
+    //         headers: { "Content-Type": "application/json" },
+    //         body: JSON.stringify(tree)
+    //     });
+    // };
 
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
@@ -61,7 +61,7 @@ const PersonForm: React.FC<Props> = ({ treeData, onUpdateTree, currentUser }) =>
 
         const updatedTree = { persons: updatedPersons, relations: updatedRelations };
         onUpdateTree(updatedTree);
-        await sendTreeToServer(updatedTree);
+        // await sendTreeToServer(updatedTree);
 
         if (addTargetId && addLinkType) {
             const relatedPerson = treeData.persons.find(p => p.id === addTargetId);
@@ -100,7 +100,7 @@ const PersonForm: React.FC<Props> = ({ treeData, onUpdateTree, currentUser }) =>
         };
 
         onUpdateTree(updatedTree);
-        await sendTreeToServer(updatedTree);
+        // await sendTreeToServer(updatedTree);
 
         const personA = treeData.persons.find(p => p.id === connectTargetId);
         const personB = treeData.persons.find(p => p.id === connectSecondId);

@@ -9,28 +9,14 @@ import "../styles/person-card.css";
 import { FamilyTree } from "../types/FamilyTree";
 import { addLogEntry } from "../services/logService";
 
-const initialData: FamilyTree = {
-    persons: [
-        { id: "1", fullName: "Окак Окакий Евгеньевич", birthDate: "2003-09-01", photoUrl: "" },
-        { id: "2", fullName: "Окак Акакия Сергеевна", birthDate: "2003-12-12", photoUrl: "" },
-        { id: "3", fullName: "Окак Виталий Окакиевич", birthDate: "2022-01-01", photoUrl: "" }
-    ],
-    relations: [
-        { from: "1", to: "2", type: "spouse" },
-        { from: "1", to: "3", type: "parent" },
-        { from: "2", to: "3", type: "parent" }
-    ]
-};
-
 const App: React.FC = () => {
+    const API_BASE = '/api/tree';
+
     const navigate = useNavigate();
     const sidebarRef = useRef<HTMLDivElement>(null);
 
     const [sidebarOpen, setSidebarOpen] = useState(true);
-    const [treeData, setTreeData] = useState<FamilyTree>(() => {
-        const saved = localStorage.getItem("saved_tree");
-        return saved ? JSON.parse(saved) : initialData;
-    });
+    const [treeData, setTreeData] = useState<FamilyTree>({ persons: [], relations: [] });
     const [showLabels, setShowLabels] = useState<boolean>(() => {
         const saved = localStorage.getItem("show_labels");
         return saved ? JSON.parse(saved) : true;
@@ -40,9 +26,55 @@ const App: React.FC = () => {
         return saved ? JSON.parse(saved) : true;
     });
 
-    const [currentUser, setCurrentUser] = useState<string>(() => localStorage.getItem("current_user") || "");
+
+    const [projectId, setProjectId] = useState(() => localStorage.getItem("project_id") || "");
+    const [projectIdInput, setProjectIdInput] = useState("");
+
+const [currentUser, setCurrentUser] = useState<string>(() => localStorage.getItem("current_user") || "");
     const [nameInput, setNameInput] = useState("");
     const [toggleLeft, setToggleLeft] = useState("1rem");
+
+    useEffect(() => {
+        if (!projectId || projectId.trim() === "") return;
+
+        console.log("Fetching tree with projectId:", projectId);
+
+        fetch(`${API_BASE}?projectId=${encodeURIComponent(projectId)}`)
+            .then(res => {
+                if (!res.ok) throw new Error(`Failed to fetch: ${res.status}`);
+                return res.json();
+            })
+            .then(data => {
+                if (data) {
+                    setTreeData(data);
+                } else {
+                    console.log("Пустое дерево, создаём заново");
+                    setTreeData({ persons: [], relations: [] });
+                }
+            })
+            .catch(console.error);
+    }, [projectId]);
+
+
+    useEffect(() => {
+        if (!projectId || treeData.persons.length === 0) return;
+        console.log("Saving to server:", projectId, treeData);
+        fetch(API_BASE, {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ projectId, treeData })
+        })
+            .then(res => {
+                if (!res.ok) throw new Error(`Failed to save: ${res.status}`);
+                return res.json();
+            })
+            .then(data => {
+                console.log("Saved successfully:", data);
+            })
+            .catch(err => {
+                console.error("Error saving tree:", err);
+            });
+    }, [treeData, projectId]);
 
     useEffect(() => {
         const handler = (e: any) => {
@@ -50,16 +82,12 @@ const App: React.FC = () => {
         };
         window.addEventListener("tree:update", handler);
         return () => window.removeEventListener("tree:update", handler);
-    }, []);
+    }, [projectId]);
 
     useEffect(() => {
         const sidebarWidth = sidebarRef.current?.offsetWidth || 0;
         setToggleLeft(sidebarOpen ? `${sidebarWidth + 10}px` : "1rem");
     }, [sidebarOpen]);
-
-    useEffect(() => {
-        localStorage.setItem("saved_tree", JSON.stringify(treeData));
-    }, [treeData]);
 
     useEffect(() => {
         localStorage.setItem("show_labels", JSON.stringify(showLabels));
@@ -183,24 +211,38 @@ const App: React.FC = () => {
             </footer>
 
             {!currentUser && (
-                <div className="modal-screen">
+                <div className="modal-screen" onClick={(e) => {
+                    if (e.target === e.currentTarget) {
+                        // нажали вне формы
+                    }
+                }}>
                     <form
                         className="modal"
+                        onClick={(e) => e.stopPropagation()}
                         onSubmit={(e) => {
                             e.preventDefault();
-                            if (nameInput.trim()) {
+                            if (nameInput.trim() && projectIdInput.trim()) {
                                 localStorage.setItem("current_user", nameInput.trim());
+                                localStorage.setItem("project_id", projectIdInput.trim());
                                 setCurrentUser(nameInput.trim());
+                                setProjectId(projectIdInput.trim());
+                                setTreeData({ ...treeData });
                             }
                         }}
                     >
-                        <h2>Введите ваше имя</h2>
+                        <h2>Введите имя и идентификатор проекта</h2>
                         <input
                             type="text"
                             placeholder="Ваше имя"
                             value={nameInput}
                             onChange={(e) => setNameInput(e.target.value)}
                             autoFocus
+                        />
+                        <input
+                            type="text"
+                            placeholder="projectId"
+                            value={projectIdInput}
+                            onChange={(e) => setProjectIdInput(e.target.value)}
                         />
                         <button type="submit">Начать</button>
                     </form>
