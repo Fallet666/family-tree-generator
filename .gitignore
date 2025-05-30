@@ -3,3 +3,4 @@ server/node_modules/
 .idea
 client.zip
 .DS_Store
+server/logs/actions.log
