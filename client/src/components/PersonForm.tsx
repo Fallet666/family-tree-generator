@@ -14,25 +14,24 @@ const PersonForm: React.FC<Props> = ({ treeData, onUpdateTree, currentUser }) =>
     const [birthDate, setBirthDate] = useState("");
     const [photoUrl, setPhotoUrl] = useState("");
 
-    // для формы добавления человека
     const [addLinkType, setAddLinkType] = useState<"" | "parent" | "child" | "spouse">("");
     const [addTargetId, setAddTargetId] = useState("");
 
-    // для формы добавления связи
     const [connectLinkType, setConnectLinkType] = useState<"" | "parent" | "child" | "spouse">("");
     const [connectTargetId, setConnectTargetId] = useState("");
     const [connectSecondId, setConnectSecondId] = useState("");
 
-    const relationMap: Record<string, string> = {
+    const relationMap: Record<RelationType, string> = {
+        "" : "",
         parent: "родитель",
         child: "ребёнок",
         spouse: "супруг(а)"
     };
 
     const sendTreeToServer = async (tree: FamilyTree) => {
-        await fetch('/api/tree', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
+        await fetch("/api/tree", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
             body: JSON.stringify(tree)
         });
     };
@@ -66,7 +65,7 @@ const PersonForm: React.FC<Props> = ({ treeData, onUpdateTree, currentUser }) =>
 
         if (addTargetId && addLinkType) {
             const relatedPerson = treeData.persons.find(p => p.id === addTargetId);
-            const readable = `${currentUser} добавил ${fullName} (род. ${birthDate}) и связал с ${relatedPerson?.fullName || addTargetId} как ${relationMap[addLinkType]}`;
+            const readable = `${currentUser} добавил ${fullName} (род. ${birthDate}) и связал с ${relatedPerson?.fullName || addTargetId} как ${relationMap[addLinkType as RelationType]}`;
             await addLogEntry(readable);
         } else {
             const readable = `${currentUser} добавил ${fullName} (род. ${birthDate})`;
@@ -83,23 +82,36 @@ const PersonForm: React.FC<Props> = ({ treeData, onUpdateTree, currentUser }) =>
     const handleCreateLink = async () => {
         if (!connectTargetId || !connectSecondId || connectTargetId === connectSecondId || !connectLinkType) return;
 
-        const newRelation = { from: connectTargetId, to: connectSecondId, type: connectLinkType };
+        let newRelation: { from: string; to: string; type: RelationType } | null = null;
+
+        if (connectLinkType === "parent") {
+            newRelation = { from: connectTargetId, to: connectSecondId, type: "parent" };
+        } else if (connectLinkType === "child") {
+            newRelation = { from: connectSecondId, to: connectTargetId, type: "parent" };
+        } else if (connectLinkType === "spouse") {
+            newRelation = { from: connectTargetId, to: connectSecondId, type: "spouse" };
+        }
+
+        if (!newRelation) return;
+
         const updatedTree = {
             persons: treeData.persons,
             relations: [...treeData.relations, newRelation]
         };
+
         onUpdateTree(updatedTree);
         await sendTreeToServer(updatedTree);
 
         const personA = treeData.persons.find(p => p.id === connectTargetId);
         const personB = treeData.persons.find(p => p.id === connectSecondId);
-        const readable = `${currentUser} создал связь: ${personA?.fullName || connectTargetId} → ${personB?.fullName || connectSecondId} [${relationMap[connectLinkType]}]`;
+        const readable = `${currentUser} создал связь: ${personA?.fullName || connectTargetId} → ${personB?.fullName || connectSecondId} как ${relationMap[connectLinkType as RelationType]}`;
         await addLogEntry(readable);
 
         setConnectTargetId("");
         setConnectSecondId("");
         setConnectLinkType("");
     };
+
 
     return (
         <form className="person-form" onSubmit={handleSubmit}>
@@ -124,10 +136,7 @@ const PersonForm: React.FC<Props> = ({ treeData, onUpdateTree, currentUser }) =>
                 onChange={(e) => setPhotoUrl(e.target.value)}
             />
 
-            <select
-                value={addLinkType}
-                onChange={(e) => setAddLinkType(e.target.value as any)}
-            >
+            <select value={addLinkType} onChange={(e) => setAddLinkType(e.target.value as any)}>
                 <option value="">— Роль —</option>
                 <option value="parent">Родитель</option>
                 <option value="child">Ребёнок</option>
@@ -147,10 +156,7 @@ const PersonForm: React.FC<Props> = ({ treeData, onUpdateTree, currentUser }) =>
 
             <h2>Добавить связь</h2>
             <div className="link-form">
-                <select
-                    value={connectLinkType}
-                    onChange={(e) => setConnectLinkType(e.target.value as any)}
-                >
+                <select value={connectLinkType} onChange={(e) => setConnectLinkType(e.target.value as any)}>
                     <option value="">— Роль —</option>
                     <option value="parent">Родитель</option>
                     <option value="child">Ребёнок</option>
