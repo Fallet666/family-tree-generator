@@ -66,10 +66,10 @@ const PersonForm: React.FC<Props> = ({ treeData, onUpdateTree, currentUser }) =>
 
         if (addTargetId && addLinkType) {
             const relatedPerson = treeData.persons.find(p => p.id === addTargetId);
-            const readable = `🧬+🔗 ${currentUser} добавил ${fullName} (род. ${birthDate}) и связал с ${relatedPerson?.fullName || addTargetId} как ${relationMap[addLinkType]}`;
+            const readable = `${currentUser} добавил ${fullName} (род. ${birthDate}) и связал с ${relatedPerson?.fullName || addTargetId} как ${relationMap[addLinkType]}`;
             await addLogEntry(readable);
         } else {
-            const readable = `🧬 ${currentUser} добавил ${fullName} (род. ${birthDate})`;
+            const readable = `${currentUser} добавил ${fullName} (род. ${birthDate})`;
             await addLogEntry(readable);
         }
 
@@ -93,7 +93,7 @@ const PersonForm: React.FC<Props> = ({ treeData, onUpdateTree, currentUser }) =>
 
         const personA = treeData.persons.find(p => p.id === connectTargetId);
         const personB = treeData.persons.find(p => p.id === connectSecondId);
-        const readable = `🔗 ${currentUser} создал связь: ${personA?.fullName || connectTargetId} → ${personB?.fullName || connectSecondId} [${relationMap[connectLinkType]}]`;
+        const readable = `${currentUser} создал связь: ${personA?.fullName || connectTargetId} → ${personB?.fullName || connectSecondId} [${relationMap[connectLinkType]}]`;
         await addLogEntry(readable);
 
         setConnectTargetId("");

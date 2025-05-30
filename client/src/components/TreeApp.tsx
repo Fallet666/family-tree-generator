@@ -83,7 +83,7 @@ const App: React.FC = () => {
             try {
                 const parsed = JSON.parse(content);
                 setTreeData(parsed);
-                addLogEntry(`📥 ${currentUser} импортировал дерево`);
+                addLogEntry(`${currentUser} импортировал дерево`);
             } catch (err) {
                 alert("Ошибка при импорте файла.");
             }
@@ -101,13 +101,16 @@ const App: React.FC = () => {
         a.download = "family-tree.json";
         a.click();
         URL.revokeObjectURL(url);
-        addLogEntry(`📤 ${currentUser} экспортировал дерево`);
+        addLogEntry(`${currentUser} экспортировал дерево`);
     };
 
     const handleDeleteTree = () => {
+        const confirmed = window.confirm("Вы уверены, что хотите удалить всё семейное древо?");
+        if (!confirmed) return;
+
         setTreeData({ persons: [], relations: [] });
         localStorage.removeItem("saved_tree");
-        addLogEntry(`🗑 ${currentUser} удалил всё семейное дерево`);
+        addLogEntry(`${currentUser} удалил всё семейное дерево`);
     };
 
     return (
@@ -161,12 +164,10 @@ const App: React.FC = () => {
 
                         <div className="sidebar__section">
                             <button className="btn" onClick={() => navigate("/tree/log")}>
-                                🧾 История изменений
+                                История изменений
                             </button>
-                        </div>
-                        <div className="sidebar__section">
                             <button className="btn" onClick={handleDeleteTree}>
-                                🗑 Удалить граф
+                                Удалить граф
                             </button>
                         </div>
                     </div>
@@ -183,25 +184,26 @@ const App: React.FC = () => {
 
             {!currentUser && (
                 <div className="modal-screen">
-                    <div className="modal">
+                    <form
+                        className="modal"
+                        onSubmit={(e) => {
+                            e.preventDefault();
+                            if (nameInput.trim()) {
+                                localStorage.setItem("current_user", nameInput.trim());
+                                setCurrentUser(nameInput.trim());
+                            }
+                        }}
+                    >
                         <h2>Введите ваше имя</h2>
                         <input
                             type="text"
                             placeholder="Ваше имя"
                             value={nameInput}
                             onChange={(e) => setNameInput(e.target.value)}
+                            autoFocus
                         />
-                        <button
-                            onClick={() => {
-                                if (nameInput.trim()) {
-                                    localStorage.setItem("current_user", nameInput.trim());
-                                    setCurrentUser(nameInput.trim());
-                                }
-                            }}
-                        >
-                            Начать
-                        </button>
-                    </div>
+                        <button type="submit">Начать</button>
+                    </form>
                 </div>
             )}
         </>
