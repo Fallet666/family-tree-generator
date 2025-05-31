@@ -4,7 +4,8 @@
   "private": true,
   "scripts": {
     "start": "webpack serve --mode development",
-    "build": "webpack --mode production"
+    "build": "webpack --mode production",
+    "test": "jest"
   },
   "dependencies": {
     "cytoscape": "^3.24.0",
@@ -25,7 +26,20 @@
     "typescript": "^5.0.0",
     "webpack": "^5.0.0",
     "webpack-cli": "^5.0.0",
-    "webpack-dev-server": "^4.0.0"
+    "webpack-dev-server": "^4.0.0",
+    "@testing-library/react": "^14.0.0",
+    "@testing-library/jest-dom": "^6.0.0",
+    "@testing-library/user-event": "^14.4.3",
+    "@types/jest": "^29.5.0",
+    "jest": "^29.5.0",
+    "ts-jest": "^29.1.0",
+    "jest-environment-jsdom": "^29.5.0",
+    "identity-obj-proxy": "^3.0.0",
+    "util": "^0.12.5",
+    "jest-fetch-mock": "^3.0.3",
+    "@types/node": "^20.11.0",
+    "canvas": "^2.11.2",
+    "node-fetch": "2.6.12"
   },
   "proxy": "http://localhost:3000"
 }
