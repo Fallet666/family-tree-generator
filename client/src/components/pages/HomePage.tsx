@@ -1,6 +1,6 @@
 import { useNavigate } from "react-router-dom";
 import { useFamilyLog } from "../../hooks/useFamilyLog";
-import "../../styles/home-page.css";
+import "../../styles/home-page/home-page.css";
 
 export default function HomePage() {
     const navigate = useNavigate();

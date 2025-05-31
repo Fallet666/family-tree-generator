@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import { FamilyTree, RelationType } from "../types/FamilyTree";
 import { addLogEntry } from "../services/logService";
-import "../styles/form.css";
+import "../styles/form/form.css";
 
 interface Props {
     treeData: FamilyTree;

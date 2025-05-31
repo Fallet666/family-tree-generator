@@ -4,8 +4,8 @@ import FamilyTreeGraph from "./FamilyTreeGraph";
 import PersonForm from "./PersonForm";
 import "../styles/index.css";
 import "../styles/layout.css";
-import "../styles/form.css";
-import "../styles/person-card.css";
+import "../styles/form/form.css";
+import "../styles/person-card/person-card.css";
 import {FamilyTree} from "../types/FamilyTree";
 import {addLogEntry} from "../services/logService";
 
@@ -161,6 +161,12 @@ const App: React.FC = () => {
 
                         <div className="sidebar__section">
                             <button className="btn" onClick={() => {
+                                localStorage.removeItem("project_id");
+                                localStorage.removeItem("current_user");
+
+                                setTreeData({persons: [], relations: []});
+                                setProjectIdInput("");
+                                setNameInput("");
                                 setCurrentUser("");
                                 setProjectId("");
                             }}>
