@@ -1,13 +1,13 @@
-import React, { useState, useEffect, useRef } from "react";
-import { useNavigate } from "react-router-dom";
+import React, {useState, useEffect, useRef} from "react";
+import {useNavigate} from "react-router-dom";
 import FamilyTreeGraph from "./FamilyTreeGraph";
 import PersonForm from "./PersonForm";
 import "../styles/index.css";
 import "../styles/layout.css";
 import "../styles/form.css";
 import "../styles/person-card.css";
-import { FamilyTree } from "../types/FamilyTree";
-import { addLogEntry } from "../services/logService";
+import {FamilyTree} from "../types/FamilyTree";
+import {addLogEntry} from "../services/logService";
 
 const App: React.FC = () => {
     const API_BASE = '/api/tree';
@@ -16,7 +16,7 @@ const App: React.FC = () => {
     const sidebarRef = useRef<HTMLDivElement>(null);
 
     const [sidebarOpen, setSidebarOpen] = useState(true);
-    const [treeData, setTreeData] = useState<FamilyTree>({ persons: [], relations: [] });
+    const [treeData, setTreeData] = useState<FamilyTree>({persons: [], relations: []});
     const [showLabels, setShowLabels] = useState<boolean>(() => {
         const saved = localStorage.getItem("show_labels");
         return saved ? JSON.parse(saved) : true;
@@ -30,7 +30,7 @@ const App: React.FC = () => {
     const [projectId, setProjectId] = useState(() => localStorage.getItem("project_id") || "");
     const [projectIdInput, setProjectIdInput] = useState("");
 
-const [currentUser, setCurrentUser] = useState<string>(() => localStorage.getItem("current_user") || "");
+    const [currentUser, setCurrentUser] = useState<string>(() => localStorage.getItem("current_user") || "");
     const [nameInput, setNameInput] = useState("");
     const [toggleLeft, setToggleLeft] = useState("1rem");
 
@@ -49,7 +49,7 @@ const [currentUser, setCurrentUser] = useState<string>(() => localStorage.getIte
                     setTreeData(data);
                 } else {
                     console.log("Пустое дерево, создаём заново");
-                    setTreeData({ persons: [], relations: [] });
+                    setTreeData({persons: [], relations: []});
                 }
             })
             .catch(console.error);
@@ -61,8 +61,8 @@ const [currentUser, setCurrentUser] = useState<string>(() => localStorage.getIte
         console.log("Saving to server:", projectId, treeData);
         fetch(API_BASE, {
             method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({ projectId, treeData })
+            headers: {"Content-Type": "application/json"},
+            body: JSON.stringify({projectId, treeData})
         })
             .then(res => {
                 if (!res.ok) throw new Error(`Failed to save: ${res.status}`);
@@ -136,7 +136,7 @@ const [currentUser, setCurrentUser] = useState<string>(() => localStorage.getIte
         const confirmed = window.confirm("Вы уверены, что хотите удалить всё семейное древо?");
         if (!confirmed) return;
 
-        setTreeData({ persons: [], relations: [] });
+        setTreeData({persons: [], relations: []});
         localStorage.removeItem("saved_tree");
         addLogEntry(`${currentUser} удалил всё семейное дерево`);
     };
@@ -146,7 +146,7 @@ const [currentUser, setCurrentUser] = useState<string>(() => localStorage.getIte
             <button
                 onClick={() => setSidebarOpen(!sidebarOpen)}
                 className="sidebar__toggle--floating"
-                style={{ left: toggleLeft }}
+                style={{left: toggleLeft}}
                 aria-label="Toggle sidebar"
             >
                 {sidebarOpen ? "⇤" : "⇥"}
@@ -160,9 +160,18 @@ const [currentUser, setCurrentUser] = useState<string>(() => localStorage.getIte
                         </div>
 
                         <div className="sidebar__section">
+                            <button className="btn" onClick={() => {
+                                setCurrentUser("");
+                                setProjectId("");
+                            }}>
+                                Новый проект
+                            </button>
+                        </div>
+
+                        <div className="sidebar__section">
                             <label className="btn">
                                 Импорт
-                                <input type="file" accept=".json" onChange={handleImport} hidden />
+                                <input type="file" accept=".json" onChange={handleImport} hidden/>
                             </label>
                             <button className="btn" onClick={handleExport}>Экспорт</button>
                         </div>
@@ -187,7 +196,7 @@ const [currentUser, setCurrentUser] = useState<string>(() => localStorage.getIte
                         </div>
 
                         <div className="sidebar__section">
-                            <PersonForm treeData={treeData} onUpdateTree={handleAddPerson} currentUser={currentUser} />
+                            <PersonForm treeData={treeData} onUpdateTree={handleAddPerson} currentUser={currentUser}/>
                         </div>
 
                         <div className="sidebar__section">
@@ -202,7 +211,7 @@ const [currentUser, setCurrentUser] = useState<string>(() => localStorage.getIte
                 )}
 
                 <div className={`main-content ${!sidebarOpen ? "main-content--expanded" : ""}`}>
-                    <FamilyTreeGraph treeData={treeData} showLabels={showLabels} showBirthDates={showBirthDates} />
+                    <FamilyTreeGraph treeData={treeData} showLabels={showLabels} showBirthDates={showBirthDates}/>
                 </div>
             </div>
 
@@ -226,7 +235,7 @@ const [currentUser, setCurrentUser] = useState<string>(() => localStorage.getIte
                                 localStorage.setItem("project_id", projectIdInput.trim());
                                 setCurrentUser(nameInput.trim());
                                 setProjectId(projectIdInput.trim());
-                                setTreeData({ ...treeData });
+                                setTreeData({...treeData});
                             }
                         }}
                     >
